@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init();" >
+
+<mx:Script>
+<![CDATA[
+	import mx.collections.*;
+	import mx.controls.Alert;
+	import mx.events.ListEvent;
+	[Bindable]
+	public var fechaInicio:Date;
+	[Bindable]
+	public var fechaFin:Date;
+	[Bindable]
+	public var folderList:XMLList =
+		<>
+		<folder state="unchecked" label="2009" isBranch="true" >
+	      <folder state="unchecked" isBranch="true" label="Enero" >
+		      <folder state="unchecked" isBranch="false" label="01" />
+		      <folder state="unchecked" isBranch="false" label="02" />
+		      <folder state="unchecked" isBranch="false" label="03" />
+		      <folder state="unchecked" isBranch="false" label="04" />
+		      <folder state="unchecked" isBranch="false" label="05" />
+		      <folder state="unchecked" isBranch="false" label="06" />
+		      <folder state="unchecked" isBranch="false" label="07" />
+		      <folder state="unchecked" isBranch="false" label="08" />
+		      <folder state="unchecked" isBranch="false" label="09" />
+	      </folder>
+	      <folder  state="unchecked" isBranch="true" label="Febrero" >
+	          <folder state="unchecked" isBranch="false" label="01" />
+	          <folder state="unchecked" isBranch="false" label="02" />
+	      </folder>
+		</folder>		
+		</>;
+	
+	[Bindable]
+	public var folderCollection:XMLListCollection;
+	
+	private function init() : void
+	{
+		folderCollection = new XMLListCollection(folderList);
+		checkTree.dataProvider = folderCollection;
+	}
+
+
+	protected function checkTree_itemClickHandler(event:ListEvent):void
+	{
+		
+		var item:Object = Tree(event.currentTarget).selectedItem;
+		
+
+
+		var parente:XML = XML(checkTree.selectedItem).parent();
+		
+		var parentArray:Array = new Array();
+		var obj:Object = checkTree.selectedItem;				
+		parentArray.push(checkTree.selectedItem.@label);
+		var parent:Object = checkTree.getParentItem(obj);
+		while(parent != null)
+		{
+			parentArray.push(parent["@label"]);
+			obj = parent;
+			parent = checkTree.getParentItem(obj); 
+		}
+		Alert.show(parentArray.toString());
+	}
+	/*
+	 * El @parentArray contiene los elementos selecconados, ya tu puedes armarlos como necesitas.	
+	 * correo y dale clic a los elementos
+	*/
+
+]]>
+</mx:Script>
+	<mx:Tree
+			id="checkTree"
+			itemRenderer="util.CheckTreeRenderer"
+			labelField="@label"
+ 			width="100%" height="100%" itemClick="checkTree_itemClickHandler(event)">
+ 	</mx:Tree>
+</mx:Application>

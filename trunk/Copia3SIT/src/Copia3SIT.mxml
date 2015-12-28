@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:co="filtroFecha.*"
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600"
+			   creationComplete="init()">
+	<fx:Script>
+		<![CDATA[
+			import clases.ArrayCollectionExtended;
+			import clases.Paginacion;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			private var pag:Paginacion = new Paginacion();
+			[Bindable] private var arrayCP:ArrayCollection = new ArrayCollection ([{condicionesPago:"--Todos--", data:"all"},{condicionesPago:"Inmediata", data:"Inmediata"},{condicionesPago:"Vencido", data:"Vencido"}]);
+			[Bindable] private var arrayFP:ArrayCollection = new ArrayCollection([{formaPago:"--Todos--", data:"all"},{formaPago:"CHEQUE", data:"CHEQUE"},{formaPago:"EFECTIVO", data:"EFECTIVO"}]);
+			[Bindable] private var arrayFecha:ArrayCollection = new ArrayCollection([{mes:"Enero", data:1}, {mes:"Febrero", data:2},{mes:"Marzo", data:3},
+				{mes:"abril", data:4},{mes:"Mayo", data:5}, {mes:"Junio", data:6}, {mes:"Julio", data:7},{mes:"Agosto", data:8}, 
+				{mes:"Septiembre", data:9},{mes:"Octubre", data:10}, {mes:"Noviembre", data:11}, {mes:"Diciembre", data:12},{mes:"Personalizada", data:13}]);
+			[Bindable] private var ac:ArrayCollectionExtended = new ArrayCollectionExtended([
+				{idCDF:1, tipo:"Factura", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"10-10-2010", folio:"ABC48", formaPago:"CHEQUE", Pago:2.3, activo:true},
+				{idCDF:2, tipo:"Factura", anioAprobacion:2011, condicionesPago:"Inmediata", fecha:"26-08-2010", folio:"ABC47", formaPago:"EFECTIVO", Pago:3.4, activo:true},
+				{idCDF:3, tipo:"Nota", anioAprobacion:2011, condicionesPago:"Inmediata", fecha:"2010-03-26", folio:"ABC46", formaPago:"CHEQUE", Pago:2.1, activo:false},
+				{idCDF:4, tipo:"Factura", anioAprobacion:2009, condicionesPago:"Vencido", fecha:"2009-10-02", folio:"ABC45", formaPago:"CHEQUE", Pago:2.2, activo:true},
+				{idCDF:5, tipo:"Nota", anioAprobacion:2009, condicionesPago:"Inmediata", fecha:"2010-03-07", folio:"ABC44", formaPago:"CHEQUE", Pago:4.3, activo:true},
+				{idCDF:6, tipo:"Recibo", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2010-02-23", folio:"ABC43", formaPago:"CHEQUE", Pago:4.5, activo:true},
+				{idCDF:7, tipo:"Recibo", anioAprobacion:2011, condicionesPago:"Inmediata", fecha:"2009-10-22", folio:"ABC42", formaPago:"CHEQUE", Pago:4.6, activo:true},
+				{idCDF:8, tipo:"Nota", anioAprobacion:2011, condicionesPago:"Inmediata", fecha:"2009-04-21", folio:"ABC41", formaPago:"CHEQUE", Pago:5.2, activo:true},
+				{idCDF:9, tipo:"Recibo", anioAprobacion:2009, condicionesPago:"Inmediata", fecha:"2010-04-16", folio:"ABC40", formaPago:"CHEQUE", Pago:1.2, activo:false},
+				{idCDF:10, tipo:"Nota", anioAprobacion:2010, condicionesPago:"Vencido", fecha:"2010-02-26", folio:"ABC39", formaPago:"CHEQUE", Pago:8.7, activo:true},
+				{idCDF:11, tipo:"Factura", anioAprobacion:2010, condicionesPago:"Vencido", fecha:"2010-04-06", folio:"ABC38", formaPago:"CHEQUE", Pago:12.4, activo:true},
+				{idCDF:12, tipo:"Nota", anioAprobacion:2010, condicionesPago:"Vencido", fecha:"2009-07-02", folio:"ABC37", formaPago:"EFECTIVO", Pago:18.5, activo:true},
+				{idCDF:13, tipo:"Factura", anioAprobacion:2011, condicionesPago:"Vencido", fecha:"2009-08-06", folio:"ABC36", formaPago:"EFECTIVO", Pago:13.4, activo:true},
+				{idCDF:14, tipo:"Recibo", anioAprobacion:2011, condicionesPago:"Vencido", fecha:"2011-08-06", folio:"ABC35", formaPago:"EFECTIVO", Pago:12.1, activo:true},
+				{idCDF:15, tipo:"Recibo", anioAprobacion:2009, condicionesPago:"Vencido", fecha:"2010-09-25", folio:"ABC34", formaPago:"EFECTIVO", Pago:16.5, activo:true},
+				{idCDF:16, tipo:"Rcibo", anioAprobacion:2010, condicionesPago:"Vencido", fecha:"2011-09-11", folio:"ABC33", formaPago:"EFECTIVO", Pago:18, activo:true},
+				{idCDF:17, tipo:"Recibo", anioAprobacion:2010, condicionesPago:"Vencido", fecha:"2010-09-24", folio:"ABC32", formaPago:"EFECTIVO", Pago:18.1, activo:false},
+				{idCDF:18, tipo:"Factura", anioAprobacion:2011, condicionesPago:"Vencido", fecha:"2010-09-29", folio:"ABC31", formaPago:"EFECTIVO", Pago:19.3, activo:true},
+				{idCDF:19, tipo:"Nota", anioAprobacion:2010, condicionesPago:"Vencido", fecha:"2011-09-21", folio:"ABC30", formaPago:"EFECTIVO", Pago:14.1, activo:true},
+				{idCDF:20, tipo:"Factura", anioAprobacion:2009, condicionesPago:"Inmediata", fecha:"2011-10-26", folio:"ABC29", formaPago:"EFECTIVO", Pago:10, activo:true},
+				{idCDF:21, tipo:"Factura", anioAprobacion:2009, condicionesPago:"Inmediata", fecha:"2011-11-26", folio:"ABC28", formaPago:"EFECTIVO", Pago:7.65, activo:true},
+				{idCDF:22, tipo:"Recibo", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2009-09-22", folio:"ABC27", formaPago:"EFECTIVO", Pago:2.8, activo:true},
+				{idCDF:23, tipo:"Nota", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2009-09-12", folio:"ABC26", formaPago:"EFECTIVO", Pago:2, activo:false},
+				{idCDF:24, tipo:"Nota", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2009-01-26", folio:"ABC25", formaPago:"EFECTIVO", Pago:2.2, activo:true},
+				{idCDF:25, tipo:"Factura", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2009-09-26", folio:"ABC24", formaPago:"CHEQUE", Pago:2.4, activo:true},
+				{idCDF:26, tipo:"Nota", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2010-09-26", folio:"ABC23", formaPago:"CHEQUE", Pago:3.2, activo:false},
+				{idCDF:27, tipo:"Recibo", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2010-09-13", folio:"ABC21", formaPago:"CHEQUE", Pago:4.3, activo:true},
+				{idCDF:28, tipo:"Factura", anioAprobacion:2010, condicionesPago:"Vencido", fecha:"2010-06-05", folio:"ABC22", formaPago:"CHEQUE", Pago:7.1, activo:true},
+				{idCDF:29, tipo:"Factura", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2010-05-26", folio:"ABC20", formaPago:"EFECTIVO", Pago:7.6, activo:true},
+				{idCDF:30, tipo:"Factura", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2010-07-04", folio:"ABC19", formaPago:"CHEQUE", Pago:6.5, activo:true},
+				{idCDF:31, tipo:"Factura", anioAprobacion:2010, condicionesPago:"Vencido", fecha:"2010-02-10", folio:"ABC18", formaPago:"CHEQUE", Pago:5.6, activo:false},
+				{idCDF:32, tipo:"Nota", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2010-08-06", folio:"ABC17", formaPago:"EFECTIVO", Pago:10, activo:true},
+				{idCDF:33, tipo:"Factura", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2010-09-12", folio:"ABC16", formaPago:"CHEQUE", Pago:12.3, activo:true},
+				{idCDF:34, tipo:"Recibo", anioAprobacion:2011, condicionesPago:"Vencido", fecha:"2011-01-26", folio:"ABC15", formaPago:"CHEQUE", Pago:18.7, activo:true},
+				{idCDF:35, tipo:"Recibo", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2010-03-22", folio:"ABC14", formaPago:"EFECTIVO", Pago:17.6, activo:true},
+				{idCDF:36, tipo:"Factura", anioAprobacion:2011, condicionesPago:"Inmediata", fecha:"2010-06-12", folio:"ABC13", formaPago:"EFECTIVO", Pago:17.65, activo:false},
+				{idCDF:37, tipo:"Nota", anioAprobacion:2011, condicionesPago:"Inmediata", fecha:"2011-06-26", folio:"ABC12", formaPago:"CHEQUE", Pago:10.1, activo:true},
+				{idCDF:38, tipo:"Factura", anioAprobacion:2011, condicionesPago:"Inmediata", fecha:"2010-11-20", folio:"ABC09", formaPago:"CHEQUE", Pago:11.2, activo:true},
+				{idCDF:39, tipo:"Recibo", anioAprobacion:2009, condicionesPago:"Vencido", fecha:"2010-09-30", folio:"ABC08", formaPago:"EFECTIVO", Pago:13, activo:true},
+				{idCDF:40, tipo:"Recibo", anioAprobacion:2011, condicionesPago:"Inmediata", fecha:"2010-09-29", folio:"ABC07", formaPago:"EFECTIVO", Pago:14, activo:true},
+				{idCDF:41, tipo:"Factura", anioAprobacion:2011, condicionesPago:"Vencido", fecha:"2010-10-26", folio:"ABC06", formaPago:"EFECTIVO", Pago:15, activo:true},
+				{idCDF:42, tipo:"Recibo", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2010-09-24", folio:"ABC05", formaPago:"CHEQUE", Pago:16, activo:false},
+				{idCDF:43, tipo:"Recibo", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2010-09-12", folio:"ABC04", formaPago:"CHEQUE", Pago:17, activo:true},
+				{idCDF:44, tipo:"Nota", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2010-09-21", folio:"ABC03", formaPago:"CHEQUE", Pago:12, activo:true},
+				{idCDF:45, tipo:"Factura", anioAprobacion:2010, condicionesPago:"Inmediata", fecha:"2010-02-26", folio:"ABC01", formaPago:"EFECTIVO", Pago:1, activo:true},
+				{idCDF:46, tipo:"Nota", anioAprobacion:2011, condicionesPago:"Vencido", fecha:"2011-09-26", folio:"ABC12", formaPago:"EFECTIVO", Pago:2, activo:true},
+				{idCDF:47, tipo:"Factura", anioAprobacion:2009, condicionesPago:"Vencido", fecha:"2019-09-26", folio:"ABC02", formaPago:"EFECTIVO", Pago:3, activo:true},
+				{idCDF:48, tipo:"Factura", anioAprobacion:2010, condicionesPago:"Vencido", fecha:"2010-11-06", folio:"ABC11", formaPago:"EFECTIVO", Pago:4, activo:true},
+				{idCDF:49, tipo:"Factura", anioAprobacion:2010, condicionesPago:"Vencido", fecha:"2010-02-21", folio:"ABC10", formaPago:"CHEQUE", Pago:10, activo:true}]);
+			
+			private var selectedMinPrice:int = 0;
+			private var selectedMaxPrice:int = 20;
+			private var selectedTipo:String = "";
+			private var selectedCondicionesPago:String = "all";
+			private var selectedFormaPago:String = "all";
+			private var selectedIDCFD:String = "";
+			private var selectedAnio:Number = 0;
+			private var selectedFolio:String = "";
+			private var selectedActivo:Boolean = false;
+			private var selectedFecha1:Date;
+			private var selectedFecha2:Date;
+			
+			[Bindable]
+			private var items:ArrayCollection=new ArrayCollection([
+				{anio:'2009', value:1},
+				{anio:'2010', value:2, assigned:true},
+				{anio:'2011', value:3}
+			]);
+			[Bindable]
+			private var myText:String='';
+			
+			private function init():void{
+				
+				/* setup the filters array: in order to take effect
+				* you must call refresh() on the collection
+				*/
+				anioApro_changeHandler();
+				ac.filterFunctions = 
+					[
+						filtroPrecio,filtroCondicionPago,
+						filtroFormaPago, filtroIDCFD,
+						filtroTipo, filtroAnio, filtroFolio,
+						filtroActivo,filtroFecha
+					]
+				ac.refresh();
+				dtgCFD.dataProvider = pag.modularArray(ac);
+				lbPaginacion.text = "Página "+ pag.pagInicio + " de "+ pag.pagFin;
+				lbTotal.text = "Total columna Pago " + pag.total;
+				lbRegistros.text = "Número de Registros: " + pag.longArray;
+				
+			}
+			// your classic filter functions
+			private function filtroPrecio( item:Object ):Boolean
+			{
+				
+				if( selectedMinPrice <= item.Pago && selectedMaxPrice > item.Pago)
+					return true;
+				return false;
+			}
+			private function filtroCondicionPago( item:Object ):Boolean
+			{
+				if( item.condicionesPago == selectedCondicionesPago || selectedCondicionesPago == "all" )
+					return true;
+				return false;
+			}
+			private function filtroFormaPago( item:Object ):Boolean
+			{
+				if( item.formaPago == selectedFormaPago || selectedFormaPago == "all" )
+					return true;
+				return false;
+			}
+			private function filtroIDCFD( item:Object):Boolean{
+				if (selectedIDCFD == ''){
+					return true;
+				}else if( item.idCDF == selectedIDCFD)
+					return true;
+				return false;
+			}
+			private function filtroTipo( item:Object):Boolean{
+				if (selectedTipo == ''){
+					return true;
+				}else if( item.tipo.match(new RegExp(selectedTipo, "i")))
+					return true;
+				return false;
+			}
+			private function filtroAnio( item:Object):Boolean{
+				if (selectedAnio == 0){
+					return true;
+				}else if( item.anioAprobacion == selectedAnio)
+					return true;
+				return false;
+			}
+			private function filtroFolio( item:Object):Boolean{
+				if (selectedFolio == ''){
+					return true;
+				}else if( item.folio.match(new RegExp(selectedFolio, "i")))
+					return true;
+				return false;
+			}
+			private function filtroActivo( item:Object):Boolean{
+				if (selectedActivo == false){
+					return true;
+				}else if( item.activo == true)
+					return true;
+				return false;
+			}
+			private function filtroFecha(item:Object):Boolean{
+				//var da:Date = DateField.stringToDate(item.fecha,"DD/MM/YYYY");
+				var formateador:DateFormatter = new DateFormatter();
+				formateador.formatString="DD/MM/YYYY";
+				var da:Date = new Date(formateador.format(item.fecha));
+				if(selectedFecha1 == undefined || selectedFecha2 == undefined)
+				{
+					return true;
+					trace("El usuario no seleccionó fecha");
+				}else if((selectedFecha1.time <  da.time) &&  (da.time < selectedFecha2.time)){
+					return true;
+				}
+				return false;
+				
+			
+			
+			
+			
+			} 
+			
+			//date1.setTime() < date2.setTime()
+			private function productPriceChangeHandler():void
+			{
+				selectedMinPrice = hsPrecio.values[0];
+				selectedMaxPrice =hsPrecio.values[1];
+				trace (selectedMinPrice + "  " + selectedMaxPrice);
+				ac.refresh();
+				dtgCFD.dataProvider = pag.modularArray(ac);
+				lbPaginacion.text = "Página "+ pag.pagInicio + " de "+ pag.pagFin;
+				lbTotal.text = "Total columna Pago " + pag.total;
+				lbRegistros.text = "Número de Registros: " + pag.longArray;
+			}
+			
+			protected function cmbCondicionesPago_changeHandler():void
+			{
+				// TODO Auto-generated method stub
+				if( cmbCondicionesPago.selectedItem != null )
+					selectedCondicionesPago = cmbCondicionesPago.selectedItem.data;
+				ac.refresh();
+				dtgCFD.dataProvider = pag.modularArray(ac);
+				lbPaginacion.text = "Página "+ pag.pagInicio + " de "+ pag.pagFin;
+				lbTotal.text = "Total columna Pago " + pag.total;
+				lbRegistros.text = "Número de Registros: " + pag.longArray;
+			}
+			protected function cmbFormaPago_changeHandler():void{
+				if(cmbFormaPago.selectedItem != null)
+					selectedFormaPago = cmbFormaPago.selectedItem.data;
+				ac.refresh();
+				dtgCFD.dataProvider = pag.modularArray(ac);
+				lbPaginacion.text = "Página "+ pag.pagInicio + " de "+ pag.pagFin;
+				lbTotal.text = "Total columna Pago " + pag.total;
+				lbRegistros.text = "Número de Registros: " + pag.longArray;
+			}
+			
+			
+			protected function txt_idCFD_changeHandler():void
+			{
+				// TODO Auto-generated method stub
+				selectedIDCFD = txt_idCFD.text;
+				ac.refresh();
+				dtgCFD.dataProvider = pag.modularArray(ac);
+				lbPaginacion.text = "Página "+ pag.pagInicio + " de "+ pag.pagFin;
+				lbTotal.text = "Total columna Pago " + pag.total;
+				lbRegistros.text = "Número de Registros: " + pag.longArray;
+			}
+			protected function txt_Tipo_changeHandler():void
+			{
+				// TODO Auto-generated method stub
+				selectedTipo = txt_tipo.text;
+				ac.refresh();
+				dtgCFD.dataProvider = pag.modularArray(ac);
+				lbPaginacion.text = "Página "+ pag.pagInicio + " de "+ pag.pagFin;
+				lbTotal.text = "Total columna Pago " + pag.total;
+				lbRegistros.text = "Número de Registros: " + pag.longArray;
+			}
+			
+			
+			protected function anioApro_changeHandler():void
+			{
+				// TODO Auto-generated method stub
+				selectedAnio = anioApro.value;
+				ac.refresh();
+				dtgCFD.dataProvider = pag.modularArray(ac);
+				lbPaginacion.text = "Página "+ pag.pagInicio + " de "+ pag.pagFin;
+				lbTotal.text = "Total columna Pago " + pag.total;
+				lbRegistros.text = "Número de Registros: " + pag.longArray;
+				//trace (selectedAnio);
+			}
+			
+			
+			protected function txt_folio_changeHandler():void
+			{
+				// TODO Auto-generated method stub
+				selectedFolio = txt_folio.text;
+				ac.refresh();
+				dtgCFD.dataProvider = pag.modularArray(ac);
+				lbPaginacion.text = "Página "+ pag.pagInicio + " de "+ pag.pagFin;
+				lbTotal.text = "Total columna Pago " + pag.total;
+				lbRegistros.text = "Número de Registros: " + pag.longArray;
+			}
+			
+			
+			protected function chbActivo_changeHandler():void
+			{
+				// TODO Auto-generated method stub
+				if(chbActivo.selected == true){
+					selectedActivo = true;
+				}else{
+					selectedActivo = false;
+				}
+				ac.refresh();
+				dtgCFD.dataProvider = pag.modularArray(ac);
+				lbPaginacion.text = "Página "+ pag.pagInicio + " de "+ pag.pagFin;
+				lbTotal.text = "Total columna Pago " + pag.total;
+				lbRegistros.text = "Número de Registros: " + pag.longArray;
+			}
+			
+			
+			protected function button1_clickHandler():void
+			{
+				// TODO Auto-generated method stub
+				dtgCFD.dataProvider = pag.next(ac);
+				lbPaginacion.text = "Página "+ pag.pagInicio + " de "+ pag.pagFin;
+			}
+			
+			
+			protected function button2_clickHandler():void
+			{
+				// TODO Auto-generated method stub
+				dtgCFD.dataProvider = pag.back(ac);
+				lbPaginacion.text = "Página "+ pag.pagInicio + " de "+ pag.pagFin;
+			}
+			protected function cambioFecha():void{
+				//selectedFecha1 = (fecha1.formatString='YYYY/MM/DD');
+				//selectedFecha2 = (fecha2.formatString='YYYY/MM/DD');
+				//trace (selectedFecha1 + "    " + selectedFecha2);
+				selectedFecha1 = fecha1.selectedDate;
+				selectedFecha2 = fecha2.selectedDate;
+				ac.refresh();
+				dtgCFD.dataProvider = pag.modularArray(ac);
+				lbPaginacion.text = "Página "+ pag.pagInicio + " de "+ pag.pagFin;
+				lbTotal.text = "Total columna Pago " + pag.total;
+				lbRegistros.text = "Número de Registros: " + pag.longArray;
+				
+			}
+			private function formateoFechaColumna(ob:Object,objeto:DataGridColumn):String
+			{
+				return dateFormatter.format(ob[objeto.dataField]);
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		
+		<mx:DateFormatter id="dateFormatter" formatString="DD/MM/YYYY" />
+		<mx:DateFormatter id="formatDate" formatString="YYYY" />
+	</fx:Declarations>
+	<s:VGroup width="100%" height="100%">
+		<s:VGroup width="100%" height="120" verticalAlign="bottom" horizontalAlign="center" paddingLeft="10" paddingRight="10" gap="0">
+			<s:HGroup height="100%" width="100%" verticalAlign="top" paddingTop="10" horizontalAlign="center">
+				<s:Label id="lbTotal"/>
+				<s:Label id="lbRegistros"/>
+				<s:Label id="lbPaginacion"/>
+				<s:Button label="Atrás" click="button2_clickHandler()"/>
+				<s:Button label="Siguiente" click="button1_clickHandler()"/>
+				<mx:Image source="images/impresora.png" toolTip="Imprimir"/>
+				<mx:Image source="images/pdf.gif" toolTip="Exportar a PDF"/>
+				<mx:Image source="images/ic_excel.gif" toolTip="Exportar a Excel"/>
+			</s:HGroup>
+			<s:HGroup height="100%" width="100%" verticalAlign="bottom" horizontalAlign="center">
+				<s:VGroup width="100%">
+					<s:Label text="ID CFD"/>
+					<s:TextInput id="txt_idCFD" change="txt_idCFD_changeHandler()"/>					
+				</s:VGroup>
+				<s:VGroup width="100%">
+					<s:Label text="Tipo"/>
+					<s:TextInput id="txt_tipo" change="txt_Tipo_changeHandler()"/>				
+				</s:VGroup>
+				<s:VGroup width="100%">
+					<s:Label text="Año Aprobación"/>
+					<s:NumericStepper id="anioApro" minimum="2009" value="2010" maximum="2011" change="anioApro_changeHandler()"/>						
+				</s:VGroup>
+				<s:VGroup width="100%">
+					<s:Label text="Condiciones Pago"/>
+					<s:ComboBox id="cmbCondicionesPago" dataProvider="{arrayCP}" change="cmbCondicionesPago_changeHandler()" labelField="condicionesPago"/>				
+				</s:VGroup>
+				<s:VGroup width="100%">
+					<s:Label text="Fecha"/>
+					<mx:DateField id="fecha1" 
+								  yearNavigationEnabled="true" change="cambioFecha()"  formatString="DD/MM/YYYY"/>
+					<mx:DateField id="fecha2" yearNavigationEnabled="true" change="cambioFecha()" formatString="DD/MM/YYYY"/>
+				</s:VGroup>
+				<s:VGroup width="100%">
+					<s:Label text="Folio"/>
+					<s:TextInput id="txt_folio" change="txt_folio_changeHandler()"/>					
+				</s:VGroup>
+				<s:VGroup width="100%">
+					<s:Label text="Forma Pago"/>
+					<s:ComboBox id="cmbFormaPago" dataProvider="{arrayFP}" labelField="formaPago" change="cmbFormaPago_changeHandler()"/>				
+				</s:VGroup>
+				<s:VGroup width="100%">
+					<s:Label text="Cantidad"/>
+					<mx:HSlider id="hsPrecio" allowTrackClick="true" minimum="0" maximum="20" snapInterval="1" liveDragging="true" thumbCount="2" toolTip="Price" width="220" 
+								change="productPriceChangeHandler()" values="[0,20]" labels="[0, 20]"/>
+				</s:VGroup>
+				<s:VGroup width="100%">
+					<s:Label text="Activo"/>
+					<s:CheckBox id="chbActivo" change="chbActivo_changeHandler()"/>
+				</s:VGroup>
+			</s:HGroup>
+		</s:VGroup>
+		<s:HGroup width="100%" height="100%">
+			<mx:DataGrid id="dtgCFD" width="100%" height="100%">
+				<mx:columns>
+					<mx:DataGridColumn headerText="IDCFD" dataField="idCDF"/>
+					<mx:DataGridColumn headerText="Tipo" dataField="tipo"/>
+					<mx:DataGridColumn headerText="Año" dataField="anioAprobacion"/>
+					<mx:DataGridColumn headerText="Condiciones Pago" dataField="condicionesPago"/>
+					<mx:DataGridColumn headerText="Fecha" dataField="fecha" labelFunction="formateoFechaColumna"/>
+					<mx:DataGridColumn headerText="Folio" dataField="folio"/>
+					<mx:DataGridColumn headerText="Forma Pago" dataField="formaPago"/>
+					<mx:DataGridColumn headerText="Pago" dataField="Pago"/>
+					<mx:DataGridColumn headerText="Activo" dataField="activo"/>
+				</mx:columns>
+			</mx:DataGrid>
+		</s:HGroup>
+		
+	</s:VGroup>
+</s:Application>
